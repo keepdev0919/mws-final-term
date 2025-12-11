@@ -20,32 +20,24 @@ DJANGO_SERVER_URL = 'http://127.0.0.1:8000'
 API_ENDPOINT = f'{DJANGO_SERVER_URL}/api/logs/'
 TOKEN = '3aaa6f4666681d72f9aeb065a6074b9c3c1613e1'  # Django에서 생성한 Token
 
-# 객체 분류 매핑
-OBJECT_MAPPING = {
-    'person': 'VISITOR',
-    'suitcase': 'PACKAGE',
-    'backpack': 'PACKAGE',
-    'handbag': 'PACKAGE',
-}
-
 def classify_object(yolo_label):
     """
     YOLO가 감지한 객체명을 로그 타입으로 분류
+    person은 VISITOR, 그 외 모든 객체는 PACKAGE로 분류
     
     Args:
-        yolo_label: YOLO가 감지한 객체명 (예: 'person', 'suitcase')
+        yolo_label: YOLO가 감지한 객체명 (예: 'person', 'bottle', 'suitcase')
         
     Returns:
-        tuple: (log_type, description) 또는 (None, None) - 무시할 객체인 경우
+        tuple: (log_type, description)
     """
     yolo_label_lower = yolo_label.lower()
     
-    if yolo_label_lower in OBJECT_MAPPING:
-        log_type = OBJECT_MAPPING[yolo_label_lower]
-        return log_type, yolo_label_lower
-    
-    # 매핑되지 않은 객체는 무시
-    return None, None
+    if yolo_label_lower == 'person':
+        return 'VISITOR', yolo_label_lower
+    else:
+        # person이 아닌 모든 객체는 PACKAGE로 분류
+        return 'PACKAGE', yolo_label_lower
 
 def send_to_server(image_path, log_type, description):
     """
@@ -144,26 +136,41 @@ def main():
                 
                 # 객체 분류 및 변화 감지
                 if detected_objects:
+                    # 새로운 객체 확인 (detect_change 호출 전에 계산)
+                    new_objects = detected_objects - change_detector.previous_objects
+                    
                     # 변화 감지 (새로운 객체 진입 확인)
                     if change_detector.detect_change(detected_objects):
-                        # 감지된 객체 중에서 VISITOR 또는 PACKAGE로 분류 가능한 것만 처리
-                        for label in detected_labels:
-                            log_type, description = classify_object(label)
+                        # 실제로 감지된 모든 객체 목록 (중복 제거)
+                        all_detected_str = ', '.join(sorted(detected_objects))
+                        new_objects_str = ', '.join(sorted(new_objects)) if new_objects else "없음"
+                        
+                        # 감지된 객체 중에서 분류하여 처리
+                        # person이 우선순위가 높으므로 person이 있으면 person을, 없으면 첫 번째 객체를 처리
+                        target_label = None
+                        
+                        # person이 있으면 person을 우선 처리
+                        if 'person' in detected_labels:
+                            target_label = 'person'
+                        else:
+                            # person이 없으면 첫 번째 객체 처리
+                            target_label = detected_labels[0] if detected_labels else None
+                        
+                        if target_label:
+                            log_type, description = classify_object(target_label)
                             
-                            if log_type:  # 분류 가능한 객체인 경우
-                                # 이미지 저장
-                                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
-                                image_filename = f'{log_type}_{timestamp}.jpg'
-                                image_path = save_dir / image_filename
-                                
-                                cv2.imwrite(str(image_path), frame)
-                                print(f'📸 [이미지 저장] {image_path}')
-                                
-                                # 서버로 전송
-                                send_to_server(str(image_path), log_type, description)
-                                
-                                # 한 프레임에서 하나의 객체만 처리 (중복 방지)
-                                break
+                            # 이미지 저장
+                            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+                            image_filename = f'{log_type}_{timestamp}.jpg'
+                            image_path = save_dir / image_filename
+                            
+                            cv2.imwrite(str(image_path), frame)
+                            print(f'📸 [이미지 저장] {image_path}')
+                            print(f'🔍 [감지된 객체] {all_detected_str}')
+                            print(f'✨ [새로운 객체] {new_objects_str}')
+                            
+                            # 서버로 전송
+                            send_to_server(str(image_path), log_type, description)
                 
                 # 화면에 결과 표시
                 # ultralytics의 결과를 OpenCV 형식으로 변환

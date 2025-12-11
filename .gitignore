@@ -3,54 +3,35 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
 venv/
-env/
-ENV/
-.venv
-*.egg-info/
-dist/
-build/
+.env
 
 # Django
 *.log
-*.pot
-*.pyc
 db.sqlite3
-db.sqlite3-journal
 media/
-staticfiles/
 
-# Android
+# YOLO 모델 파일 (대용량)
+*.pt
+
+# Edge System 캡처 이미지
+Edge_System/captured_images/
+
+# Android Studio
 *.iml
 .gradle/
 local.properties
 .idea/
+build/
 *.apk
 *.ap_
-*.aab
 *.dex
-*.class
-bin/
-gen/
-out/
-build/
-.gradle
-captured_images/
-*.jpg
-*.jpeg
-*.png
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+# 기타파일 폴더
+기타파일/
+
+# Mac OS
 .DS_Store
 
-# 기타
-*.docx
-*.pdf
-url.txt
-
+# PPT 임시 파일
+~$*.pptx

@@ -1,0 +1,3 @@
+서비스 URL: http://xxx.xxx.xxx
+소스코드 git 주소: http://xxx.xxx.xxx
+

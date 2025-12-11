@@ -162,14 +162,15 @@ SIMPLE_JWT = {
 }
 
 # Email settings (침입자 알림용)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # 개발용: 콘솔에 출력
-# 실제 이메일 발송 시 아래 설정 사용:
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'your-email@gmail.com'
-# EMAIL_HOST_PASSWORD = 'your-app-password'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # 실제 이메일 발송
+EMAIL_HOST = 'smtp.naver.com'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True  # SSL 사용
+EMAIL_USE_TLS = False  # TLS 비활성화
+EMAIL_HOST_USER = 'chj3123@naver.com'  # 네이버 이메일 주소
+EMAIL_HOST_PASSWORD = '1GWHP3ZE3Y1U'  # 네이버 앱 비밀번호 (아래 안내 참고)
+# 개발용 콘솔 출력으로 되돌리려면:
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # 침입자 알림 설정
 INTRUDER_ALERT_EMAIL = 'chj3123@naver.com'  # 알림을 받을 이메일 주소
