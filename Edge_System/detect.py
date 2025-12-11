@@ -15,10 +15,10 @@ from changedetection import ChangeDetector
 # YOLOv5 모델 경로
 YOLO_MODEL_PATH = 'yolov5s.pt'  # 또는 yolov5m.pt, yolov5l.pt, yolov5x.pt
 
-# Django 서버 설정
-DJANGO_SERVER_URL = 'http://127.0.0.1:8000'
+# Django 서버 설정 (PythonAnywhere 배포 서버)
+DJANGO_SERVER_URL = 'https://ikjun0919.pythonanywhere.com'
 API_ENDPOINT = f'{DJANGO_SERVER_URL}/api/logs/'
-TOKEN = '3aaa6f4666681d72f9aeb065a6074b9c3c1613e1'  # Django에서 생성한 Token
+TOKEN = 'd3f49aee6be6f0b85ff6c0f8585f4db2c7282163'  # PythonAnywhere 서버용 Token
 
 def classify_object(yolo_label):
     """
